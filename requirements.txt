@@ -1,0 +1,3 @@
+PyTelegramBotAPI==4.4.0
+typing
+colorama

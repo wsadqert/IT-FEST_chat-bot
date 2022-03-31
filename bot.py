@@ -1,7 +1,8 @@
 from aiogram import Bot, Dispatcher, types
 from messages import *
+from database import *
 
-__all__ = ['bot', 'dp']
+all__ = ['bot', 'dp']
 
 # Init
 token: Final[str] = "5285755435:AAGkUYDMlugF5J0ksNxBB20ZxNbtnLBs_eY"
@@ -19,12 +20,25 @@ markup.add(*buttons2)
 # Start/help
 @dp.message_handler(commands=['start', 'help'])
 async def start(message, res=False):
-	await bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
-	await bot.send_message(message.chat.id, info)
-	await bot.send_message(message.chat.id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
+	user_id = message.from_user.id
+	await bot.send_message(user_id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
+	await bot.send_message(user_id, info_text)
+	await bot.send_message(user_id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
+
+	try:
+		await init_user(user_id)
+	except:
+		raise
 
 
 async def subscribe(message):
+
+	async def help(message):
+		if message.text.strip() == "Помощь":
+			await bot.send_photo(message.from_user.id, 'hashtags.png')
+
+	await bot.send_message(message.from_user.id, subscribe_text, reply_markup=...)  # ИСПРАВИТЬ!
+
 	pass
 
 
@@ -45,4 +59,4 @@ async def handle_text(message):
 	elif message.text.strip() == 'Управление ботом':
 		await start(message)
 	elif message.text.strip() == 'Наши контакты':
-		await bot.send_message(message.chat.id, contacts)
+		await bot.send_message(message.chat.id, contacts_text)

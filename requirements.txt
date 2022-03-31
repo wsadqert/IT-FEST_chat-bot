@@ -1,3 +1,7 @@
-PyTelegramBotAPI==4.4.0
-typing
-colorama
+typing~=3.7.4.3
+colorama~=0.4.4
+aiogram~=2.19
+# для aiogram:
+aiohttp>=3.8.0,<3.9.0
+Babel>=2.9.1,<2.10.0
+certifi>=2021.10.8

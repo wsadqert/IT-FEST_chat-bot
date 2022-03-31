@@ -1,23 +1,48 @@
-from telebot import TeleBot, types
-from telebot.types import KeyboardButton
+from aiogram import Bot, Dispatcher, types
 from messages import *
 
+__all__ = ['bot', 'dp']
+
+# Init
 token: Final[str] = "5285755435:AAGkUYDMlugF5J0ksNxBB20ZxNbtnLBs_eY"
-bot: TeleBot = TeleBot(token)
+bot = Bot(token=token)
+dp = Dispatcher(bot)
+
+# Create main menu markup
+markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+buttons1: tuple[str, ...] = ("Подписаться", "Список подписок")
+buttons2: tuple[str, ...] = ('Управление ботом', 'Наши контакты')
+markup.add(*buttons1)
+markup.add(*buttons2)
 
 
-@bot.message_handler(commands=['start'])
-def start(m, res=False):
-	markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-	buttons = ["привет", "ещё раз привет"]
-	markup.add(*buttons)
-
-	bot.send_message(m.chat.id, "Привет! Я на связи! Вот что я умею:")
-	bot.send_message(m.chat.id, info)
-	bot.send_message(m.chat.id, "Для управления используй кнопки 👇", reply_markup=markup)
+# Start/help
+@dp.message_handler(commands=['start', 'help'])
+async def start(message, res=False):
+	await bot.send_message(message.chat.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
+	await bot.send_message(message.chat.id, info)
+	await bot.send_message(message.chat.id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
 
 
-@bot.message_handler(content_types=["text"])
-def handle_text(message):
-	if message.text.strip() == 'Наши контакты':
-		bot.send_message(message.chat.id, contacts)
+async def subscribe(message):
+	pass
+
+
+async def unsubscribe(message):
+	pass
+
+
+async def my_subscriptions(message):
+	pass
+
+
+@dp.message_handler(content_types=["text"])
+async def handle_text(message):
+	if message.text.strip() == 'Подписаться':
+		await subscribe(message)
+	elif message.text.strip() == 'Мои подписки':
+		await my_subscriptions(message)
+	elif message.text.strip() == 'Управление ботом':
+		await start(message)
+	elif message.text.strip() == 'Наши контакты':
+		await bot.send_message(message.chat.id, contacts)

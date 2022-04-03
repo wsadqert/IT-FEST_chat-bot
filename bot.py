@@ -43,15 +43,18 @@ async def subscribe(message):
 	await bot.send_message(message.from_user.id, subscribe_text, reply_markup=markup_hashtags)
 
 	for hashtag in hashtags:
-		@dp.callback_query_handler(text=hashtag[1:])
-		async def answer(call: types.CallbackQuery):
-			print('answering...')
-			try:
-				cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
-			except:
-				await call.bot.send_message(message.from_user.id, f'Произошла неизвестная ошибка!\u274c\U0001f937')
-			else:
-				await call.bot.send_message(message.from_user.id, f'Поздравляю!\U0001f389\U0001f38a Вы успешно подписались на обновления группы вк по хэштегу {hashtag}')
+		# мне пришлось юзать `exec`; у меня не было выхода(((
+		# простите пж(
+		exec(f"""
+	@dp.callback_query_handler(text=hashtag[1:])
+	async def answer{hashtags.index(hashtag)}(call: types.CallbackQuery):
+		try:
+			cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
+		except:
+			await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
+		else:
+			await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Вы успешно подписались на обновления группы вк по хэштегу {hashtag}')
+	""")
 
 
 async def unsubscribe(message):

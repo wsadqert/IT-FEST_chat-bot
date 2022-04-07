@@ -1,10 +1,11 @@
+import webbrowser
 from aiogram import executor
 from rich.traceback import install
 import asyncio
 
 from constants import *
 from bot import *
-from vk_parser import *
+# from vk_parser import *
 import database as db
 
 install(show_locals=True, width=300)

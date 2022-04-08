@@ -1,5 +1,5 @@
 from aiogram import types, Bot, Dispatcher
-from constants import info_text, hashtags, subscribe_text, contacts_text
+from constants import info_text, hashtags, subscribe_text, contacts_text, group_ids
 from tokens import TELEGRAM_TOKEN
 import database as db
 
@@ -13,17 +13,22 @@ buttons2: tuple[str, ...] = ('Управление ботом', 'Наши кон
 markup.add(*buttons1)
 markup.add(*buttons2)
 
+empty_markup = types.ReplyKeyboardRemove
+
 section: str = 'main'
 
 
 # Start/help
 @dp.message_handler(commands=['start', 'help'])
 async def start(message, res=False):
-	await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
-	await bot.send_message(message.from_user.id, info_text)
-	await bot.send_message(message.from_user.id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
+	if section == 'main':
+		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
+		await bot.send_message(message.from_user.id, info_text)
+		await bot.send_message(message.from_user.id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
 
-	db.init_user(message.from_user.id)
+		db.init_user(message.from_user.id)
+	else:
+		await bot.send_message(message.from_user.id, "Ошибка: бот уже запущен!")
 
 
 async def subscribe(message):
@@ -51,7 +56,7 @@ async def answer{hashtags.index(hashtag)}(call: types.CallbackQuery):
 	except:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
 	else:
-		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк по хэштегу {hashtag}')
+		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк {group_ids[hashtags.index(hashtag)]}по хэштегу {hashtag}')
 	""")
 
 
@@ -65,6 +70,7 @@ async def my_subscriptions(message):
 
 @dp.message_handler(content_types=["text"])
 async def main(message):
+	global section
 	if section == 'main':
 		if message.text.strip() == 'Подписаться':
 			await subscribe(message)
@@ -74,6 +80,7 @@ async def main(message):
 			await start(message)
 		elif message.text.strip() == 'Наши контакты':
 			await bot.send_message(message.chat.id, contacts_text)
+	section = 'main'
 
 	# тут сделать бесконечный цикл, вставить парсер
 	while True:

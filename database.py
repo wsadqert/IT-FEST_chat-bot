@@ -1,5 +1,6 @@
 import sqlite3
-from constants import *
+from constants import db_path
+
 con = sqlite3.connect(db_path)
 cur = con.cursor()
 

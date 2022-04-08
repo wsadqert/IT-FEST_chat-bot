@@ -17,44 +17,44 @@ db_path: Final[PATH] = './data.db'
 
 # VK
 hashtags: Final[list[str]] = [
-	"#TechnoCom",
-	"#IT_fest_2022",
-	"#IASF2022",
-	"#ФестивальОКК",
-	"#Нейрофест",
-	"#НевидимыйМир",
-	"#КонкурсНИР",
-	"#VRARFest3D"
+    "#TechnoCom",
+    "#IT_fest_2022",
+    "#IASF2022",
+    "#ФестивальОКК",
+    "#Нейрофест",
+    "#НевидимыйМир",
+    "#КонкурсНИР",
+    "#VRARFest3D"
 ]
 urls: Final[list[str]] = [
-	'https://vk.com/technocom2022',
-	'https://vk.com/itfest2022',
-	'https://vk.com/aerospaceproject',
-	'https://vk.com/okk_fest',
-	'https://vk.com/neurofest2022',
-	'https://vk.com/nauchim.online',
-	'https://vk.com/nauchim.online',
-	'https://vk.com/nauchim.online'
+    'https://vk.com/technocom2022',
+    'https://vk.com/itfest2022',
+    'https://vk.com/aerospaceproject',
+    'https://vk.com/okk_fest',
+    'https://vk.com/neurofest2022',
+    'https://vk.com/nauchim.online',
+    'https://vk.com/nauchim.online',
+    'https://vk.com/nauchim.online'
 ]
 group_ids: Final[list[str]] = [
-	'technocom2022',
-	'itfest2022',
-	'aerospaceproject',
-	'okk_fest',
-	'neurofest2022',
-	'nauchim.online',
-	'nauchim.online',
-	'nauchim.online'
+    'technocom2022',
+    'itfest2022',
+    'aerospaceproject',
+    'okk_fest',
+    'neurofest2022',
+    'nauchim.online',
+    'nauchim.online',
+    'nauchim.online'
 ]
 owner_ids: Final[list[int]] = [
-	-210998761,
-	-210985709,
-	-196557207,
-	-211638918,
-	-211803420,
-	-200248443,
-	-200248443,
-	-200248443
+    -210998761,
+    -210985709,
+    -196557207,
+    -211638918,
+    -211803420,
+    -200248443,
+    -200248443,
+    -200248443
 ]
 
 # Misc

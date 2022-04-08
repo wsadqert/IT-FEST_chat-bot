@@ -1,5 +1,7 @@
 from typing import Final
 
-access_token: Final[str] = "6ef34f4b6ef34f4b6eaab017486e88b02366ef36ef34f4b0cbded2a6d1447f298b125e1"
-secure_key: Final[str] = "wj0wRbk4AjF2vVAssyCN"
-service_key: Final[str] = "f9c64f60f9c64f60f9c64f606bf9bdb008ff9c6f9c64f609b8cf008520a92ddd3229816"
+TELEGRAM_TOKEN: Final[str] = "5285755435:AAGkUYDMlugF5J0ksNxBB20ZxNbtnLBs_eY"
+
+SECURE_KEY: Final[str] = "wj0wRbk4AjF2vVAssyCN"
+SERVICE_KEY: Final[str] = "f9c64f60f9c64f60f9c64f606bf9bdb008ff9c6f9c64f609b8cf008520a92ddd3229816"
+ACCESS_TOKEN: Final[str] = SERVICE_KEY

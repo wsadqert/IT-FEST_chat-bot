@@ -1,17 +1,15 @@
 import vk
-from database import *
-from constants import *
-from rich.traceback import install
-install(show_locals=True, width=300)
+from constants import owner_ids
+from tokens import ACCESS_TOKEN
 
 
 def get_posts(owner_id: int, count: int, offset: int):
-	posts = vk_api.wall.get(owner_id=owner_id, v=5.92, count=count, offset=offset)
+	posts = vk_api.wall.get(owner_id=owner_id, v=5.131, count=count, offset=offset)
 	print(posts)
 	return posts
 
 
-session = vk.Session(access_token)
+session = vk.Session(ACCESS_TOKEN)
 vk_api = vk.API(session)
 
 for owner_id in owner_ids:

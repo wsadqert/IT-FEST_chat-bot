@@ -1,8 +1,10 @@
-from aiogram import Bot, Dispatcher, types
-from constants import *
-from database import *
+from aiogram import types, Bot, Dispatcher
+from constants import info_text, hashtags, subscribe_text, contacts_text
+from tokens import TELEGRAM_TOKEN
+import database as db
 
-all__ = ['bot', 'dp']
+bot = Bot(token=TELEGRAM_TOKEN)
+dp = Dispatcher(bot)
 
 # Create main menu markup
 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -17,15 +19,11 @@ section: str = 'main'
 # Start/help
 @dp.message_handler(commands=['start', 'help'])
 async def start(message, res=False):
-	user_id = message.from_user.id
-	await bot.send_message(user_id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
-	await bot.send_message(user_id, info_text)
-	await bot.send_message(user_id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
+	await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
+	await bot.send_message(message.from_user.id, info_text)
+	await bot.send_message(message.from_user.id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
 
-	try:
-		init_user(user_id)
-	except:
-		raise
+	db.init_user(message.from_user.id)
 
 
 async def subscribe(message):
@@ -46,14 +44,14 @@ async def subscribe(message):
 		# мне пришлось юзать `exec`; у меня не было выхода(((
 		# простите пж(
 		exec(f"""
-	@dp.callback_query_handler(text=hashtag[1:])
-	async def answer{hashtags.index(hashtag)}(call: types.CallbackQuery):
-		try:
-			cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
-		except:
-			await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
-		else:
-			await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк по хэштегу {hashtag}')
+@dp.callback_query_handler(text=hashtag[1:])
+async def answer{hashtags.index(hashtag)}(call: types.CallbackQuery):
+	try:
+		cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
+	except:
+		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
+	else:
+		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк по хэштегу {hashtag}')
 	""")
 
 

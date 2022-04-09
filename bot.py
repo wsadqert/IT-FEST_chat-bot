@@ -1,6 +1,6 @@
 from aiogram import types, Bot, Dispatcher
 from itertools import compress
-from constants import HASHTAGS, SUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
+from constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT, HELP_IMG_PATH
 from tokens import TELEGRAM_TOKEN
 import database as db
 
@@ -9,8 +9,8 @@ dp = Dispatcher(bot)
 
 # Create main menu markup
 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-buttons1: tuple[str, ...] = ("Подписаться", "Список подписок")
-buttons2: tuple[str, ...] = ('Управление ботом', 'Наши контакты')
+buttons1: tuple[str, ...] = ("Подписаться", "Отписаться")
+buttons2: tuple[str, ...] = ("Список подписок", 'Наши контакты')
 markup.add(*buttons1)
 markup.add(*buttons2)
 
@@ -59,13 +59,40 @@ async def answer{HASHTAGS.index(hashtag)}(call: types.CallbackQuery):
 
 	@dp.callback_query_handler(text='help')
 	async def answer_help(call: types.CallbackQuery):
-		await bot.send_photo(message.from_user.id, 'hashtags.png')
+		await bot.send_photo(message.from_user.id, HELP_IMG_PATH)
 
 
 async def unsubscribe(message):
 	global section
 	section = 'unsubscribe'
-	hashtags = compress(HASHTAGS, await _subscriptions(message))
+
+	hashtags = list(compress(HASHTAGS, await _subscriptions(message)))
+
+	# Создание markup`а
+	markup_hashtags = types.InlineKeyboardMarkup()
+	for hashtag in hashtags:
+		markup_hashtags.add(types.InlineKeyboardButton(text=hashtag, callback_data=hashtag[1:]))
+	markup_hashtags.add(types.InlineKeyboardButton(text='Помощь', callback_data='help'))
+
+	await bot.send_message(message.from_user.id, UNSUBSCRIBE_TEXT, reply_markup=markup_hashtags)
+
+	# создание и привязка функций к кнопкам
+	for hashtag in hashtags:
+		exec(f"""
+@dp.callback_query_handler(text=hashtag[1:])
+async def answer{hashtags.index(hashtag) + 10}(call: types.CallbackQuery):
+	try:
+		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = false WHERE user_id = {message.from_user.id}")
+	except Exception as e:
+		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
+		await call.bot.send_message({message.from_user.id}, str(e))
+	else:
+		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно отписался от обновлений группы вк {GROUP_IDS[HASHTAGS.index(hashtag)]} по хэштегу {hashtag}')
+""")
+
+	@dp.callback_query_handler(text='help')
+	async def answer_help(call: types.CallbackQuery):
+		await bot.send_photo(message.from_user.id, HELP_IMG_PATH)
 	pass
 
 
@@ -89,6 +116,8 @@ async def main(message):
 		txt = message.text.strip()
 		if txt == 'Подписаться':
 			await subscribe(message)
+		elif txt == 'Отписаться':
+			await unsubscribe(message)
 		elif txt == 'Список подписок':
 			await my_subscriptions(message)
 		elif txt == 'Управление ботом':

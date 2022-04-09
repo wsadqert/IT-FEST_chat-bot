@@ -8,10 +8,12 @@ PATH: Final[type] = Union[str, bytes, PathLike[str], PathLike[bytes]]
 CONTACTS_TEXT: Final[str] = """Привет! Если у тебя возникли какие-либо вопросы, то вот наши контакты:
 Группа ВКонтакте Научим.online https://vk.com/nauchim.online
 Сайт с мероприятиями https://www.научим.online"""
-SUBSCRIBE_TEXT: Final[str] = "Выбери канал, на который ты хочешь подписаться:"
+SUBSCRIBE_TEXT: Final[str] = "Выбери канал, на который хочешь подписаться:"
+UNSUBSCRIBE_TEXT: Final[str] = "Выбери канал, от которого хочешь отписаться:"
+HELP_IMG_PATH: Final[PATH] = 'src/hashtags.png'
 
 # Database
-DB_PATH: Final[PATH] = './data.db'
+DB_PATH: Final[PATH] = 'src/data.db'
 
 # VK
 HASHTAGS: Final[list[str]] = [

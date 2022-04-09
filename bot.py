@@ -71,10 +71,11 @@ async def unsubscribe(message):
 
 
 async def my_subscriptions(message):
-	for hashtag in HASHTAGS:
-		db.cur.execute(f"SELECT {hash}").fetchall()
-		pass
-	pass
+	# Итерируемся по бд -------------------------------------------------------------------------------------------|||||||||||||||||||||||
+	# Выбираем поле с нужным user_id и хештегом ↓                                                                  |||||||||||||||||||||||
+	#                        ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	return [db.cur.execute(f"SELECT {hashtag[1:]} FROM data WHERE user_id = {message.from_user.id}").fetchone()[0] for hashtag in HASHTAGS]
+	# Выбираем 1ую запись (fetchone) и достаём 1ый (единственный) элемент кортежа -------------------^^^^^^^^^^^^^
 
 
 @dp.message_handler(content_types=["text"])
@@ -84,7 +85,7 @@ async def main(message):
 		txt = message.text.strip()
 		if txt == 'Подписаться':
 			await subscribe(message)
-		elif txt == 'Мои подписки':
+		elif txt == 'Список подписок':
 			await my_subscriptions(message)
 		elif txt == 'Управление ботом':
 			await start(message)

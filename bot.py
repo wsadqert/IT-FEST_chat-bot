@@ -43,6 +43,7 @@ async def subscribe(message):
 	for hashtag in HASHTAGS:
 		markup_hashtags.add(types.InlineKeyboardButton(text=hashtag, callback_data=hashtag[1:]))
 	markup_hashtags.add(types.InlineKeyboardButton(text='Помощь', callback_data='help'))
+	await bot.send_message(message.from_user.id, SUBSCRIBE_TEXT, reply_markup=markup_hashtags)
 
 	# создание и привязка функций к кнопкам
 	for hashtag in HASHTAGS:

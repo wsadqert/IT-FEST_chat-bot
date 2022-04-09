@@ -13,6 +13,9 @@ buttons2: tuple[str, ...] = ('Управление ботом', 'Наши кон
 markup.add(*buttons1)
 markup.add(*buttons2)
 
+markup_help = types.ReplyKeyboardMarkup(resize_keyboard=True)
+markup_help.add(['Помощь'])
+
 empty_markup = types.ReplyKeyboardRemove
 
 section: str = 'main'
@@ -20,7 +23,7 @@ section: str = 'main'
 
 # Start/help
 @dp.message_handler(commands=['start', 'help'])
-async def start(message, res=False):
+async def start(message):
 	if section == 'main':
 		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
 		await bot.send_message(message.from_user.id, INFO_TEXT)
@@ -35,30 +38,31 @@ async def subscribe(message):
 	global section
 	section = 'subscribe'
 
+	# Создание markup`а
 	markup_hashtags = types.InlineKeyboardMarkup()
 	for hashtag in HASHTAGS:
 		markup_hashtags.add(types.InlineKeyboardButton(text=hashtag, callback_data=hashtag[1:]))
+	markup_hashtags.add(types.InlineKeyboardButton(text='Помощь', callback_data='help'))
 
-	await bot.send_message(message.from_user.id, SUBSCRIBE_TEXT, reply_markup=markup_hashtags)
-
-	@dp.message_handler(content_types=["text"])
-	async def help_(message):
-		if message.text.strip() == "Помощь":
-			await bot.send_photo(message.from_user.id, 'hashtags.png')
+	# создание и привязка функций к кнопкам
 	for hashtag in HASHTAGS:
-		print(1234567890)
 		# мне пришлось юзать `exec`; у меня не было выхода(((
 		# простите пж(
 		exec(f"""
 @dp.callback_query_handler(text=hashtag[1:])
 async def answer{HASHTAGS.index(hashtag)}(call: types.CallbackQuery):
-    try:
-        cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
-    except:
-        await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
-    else:
-        await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк {GROUP_IDS[HASHTAGS.index(hashtag)]}по хэштегу {hashtag}')
+	try:
+		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
+	except Exception as e:
+		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
+		await call.bot.send_message({message.from_user.id}, str(e))
+	else:
+		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк {GROUP_IDS[HASHTAGS.index(hashtag)]} по хэштегу {hashtag}')
 """)
+
+	@dp.callback_query_handler(text='help')
+	async def answer_help(call: types.CallbackQuery):
+		await bot.send_photo(message.from_user.id, 'hashtags.png')
 
 
 async def unsubscribe(message):
@@ -84,11 +88,11 @@ async def main(message):
 		elif txt == 'Управление ботом':
 			await start(message)
 		elif txt == 'Наши контакты':
-			await bot.send_message(message.chat.id, CONTACTS_TEXT)
+			await bot.send_message(message.from_user.id, CONTACTS_TEXT)
 
 	section = 'main'
 
 	# тут сделать бесконечный цикл, вставить парсер
-	while True:
-		pass
-	pass
+	# while True:
+	#	pass
+	# pass

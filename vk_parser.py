@@ -3,14 +3,16 @@ from constants import OWNER_IDS
 from tokens import ACCESS_TOKEN
 
 
-def get_posts(owner_id: int, count: int, offset: int):
-	posts = vk_api.wall.get(owner_id=owner_id, v=5.131, count=count, offset=offset)
+def get_posts(owner_id: int, count: int, offset: int) -> dict:
+	posts: dict = vk_api.wall.get(owner_id=owner_id, v=5.131, count=count, offset=offset)
 	print(posts)
 	return posts
+
+
+def text_from_post(post: dict) -> str:
+	return post['items'][0]['text']
 
 
 session = vk.Session(ACCESS_TOKEN)
 vk_api = vk.API(session)
 
-for owner_id in OWNER_IDS:
-	get_posts(owner_id, 10, 0)

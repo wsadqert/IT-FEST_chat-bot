@@ -1,5 +1,6 @@
 from aiogram import types, Bot, Dispatcher
-from constants import INFO_TEXT, HASHTAGS, SUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
+from itertools import compress
+from constants import HASHTAGS, SUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
 from tokens import TELEGRAM_TOKEN
 import database as db
 
@@ -25,10 +26,7 @@ section: str = 'main'
 @dp.message_handler(commands=['start', 'help'])
 async def start(message):
 	if section == 'main':
-		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Вот что я умею:")
-		await bot.send_message(message.from_user.id, INFO_TEXT)
-		await bot.send_message(message.from_user.id, "Для управления используй кнопки \U0001f447", reply_markup=markup)
-
+		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Для управления используй кнопки \U0001f447", reply_markup=markup)
 		db.init_user(message.from_user.id)
 	else:
 		await bot.send_message(message.from_user.id, "Ошибка: бот уже запущен!")
@@ -47,8 +45,6 @@ async def subscribe(message):
 
 	# создание и привязка функций к кнопкам
 	for hashtag in HASHTAGS:
-		# мне пришлось юзать `exec`; у меня не было выхода(((
-		# простите пж(
 		exec(f"""
 @dp.callback_query_handler(text=hashtag[1:])
 async def answer{HASHTAGS.index(hashtag)}(call: types.CallbackQuery):
@@ -67,15 +63,23 @@ async def answer{HASHTAGS.index(hashtag)}(call: types.CallbackQuery):
 
 
 async def unsubscribe(message):
+	global section
+	section = 'unsubscribe'
+	hashtags = compress(HASHTAGS, await _subscriptions(message))
 	pass
 
 
-async def my_subscriptions(message):
+async def _subscriptions(message):
 	# Итерируемся по бд -------------------------------------------------------------------------------------------|||||||||||||||||||||||
 	# Выбираем поле с нужным user_id и хештегом ↓                                                                  |||||||||||||||||||||||
 	#                        ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	return [db.cur.execute(f"SELECT {hashtag[1:]} FROM data WHERE user_id = {message.from_user.id}").fetchone()[0] for hashtag in HASHTAGS]
 	# Выбираем 1ую запись (fetchone) и достаём 1ый (и единственный) элемент кортежа -----------------^^^^^^^^^^^^^
+
+
+async def my_subscriptions(message):
+	await bot.send_message(message.from_user.id, 'Ты подписан на хештеги:')
+	await bot.send_message(message.from_user.id, '\n'.join(compress(HASHTAGS, await _subscriptions(message))))
 
 
 @dp.message_handler(content_types=["text"])
@@ -96,5 +100,5 @@ async def main(message):
 
 	# тут сделать бесконечный цикл, вставить парсер
 	# while True:
-	#	pass
+	#   pass
 	# pass

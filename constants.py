@@ -1,13 +1,11 @@
-from typing import Final
-from colorama import Fore
-from typing import Union
+from typing import Final, Union
 from os import PathLike
+from colorama import Fore
 
 PATH: Final[type] = Union[str, bytes, PathLike[str], PathLike[bytes]]
 
 # Bot
-INFO_TEXT: Final[str] = """*здесь будет инфа про скиллы моего бота*"""
-CONTACTS_TEXT: Final[str] = """Привет! Если у вас возникли какие-либо вопросы, то вот наши контакты:
+CONTACTS_TEXT: Final[str] = """Привет! Если у тебя возникли какие-либо вопросы, то вот наши контакты:
 Группа ВКонтакте Научим.online https://vk.com/nauchim.online
 Сайт с мероприятиями https://www.научим.online"""
 SUBSCRIBE_TEXT: Final[str] = "Выбери канал, на который ты хочешь подписаться:"

@@ -1,4 +1,5 @@
 from aiogram import types, Bot, Dispatcher
+from aiogram.types import InputFile
 from itertools import compress
 from constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT, HELP_IMG_PATH
 from tokens import TELEGRAM_TOKEN
@@ -16,6 +17,8 @@ markup.add(*buttons2)
 
 markup_help = types.ReplyKeyboardMarkup(resize_keyboard=True)
 markup_help.add(['Помощь'])
+
+help_img = InputFile(HELP_IMG_PATH)
 
 empty_markup = types.ReplyKeyboardRemove
 
@@ -49,17 +52,19 @@ async def subscribe(message):
 @dp.callback_query_handler(text=hashtag[1:])
 async def answer{HASHTAGS.index(hashtag)}(call: types.CallbackQuery):
 	try:
+		if '{section}' != 'subscribe':
+			raise Exception('unknown section "{section}"')
 		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
 	except Exception as e:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
 		await call.bot.send_message({message.from_user.id}, str(e))
 	else:
-		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы вк {GROUP_IDS[HASHTAGS.index(hashtag)]} по хэштегу {hashtag}')
+		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно подписался на обновления группы VK {GROUP_IDS[HASHTAGS.index(hashtag)]} по хэштегу {hashtag}')
 """)
 
 	@dp.callback_query_handler(text='help')
 	async def answer_help(call: types.CallbackQuery):
-		await bot.send_photo(message.from_user.id, HELP_IMG_PATH)
+		await bot.send_photo(message.from_user.id, help_img)
 
 
 async def unsubscribe(message):
@@ -82,21 +87,22 @@ async def unsubscribe(message):
 @dp.callback_query_handler(text=hashtag[1:])
 async def answer{hashtags.index(hashtag) + 10}(call: types.CallbackQuery):
 	try:
-		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = false WHERE user_id = {message.from_user.id}")
+		if '{section}' != 'unsubscribe':
+			raise Exception('unknown section "{section}"')
+			db.cur.execute(f"UPDATE data SET {hashtag[1:]} = false WHERE user_id = {message.from_user.id}")
 	except Exception as e:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
 		await call.bot.send_message({message.from_user.id}, str(e))
 	else:
-		await call.bot.send_message({message.from_user.id}, f'Поздравляю!\U0001f389\U0001f38a Ты успешно отписался от обновлений группы вк {GROUP_IDS[HASHTAGS.index(hashtag)]} по хэштегу {hashtag}')
+		await call.bot.send_message({message.from_user.id}, f'Ты успешно отписался от обновлений группы VK {GROUP_IDS[HASHTAGS.index(hashtag)]} по хэштегу {hashtag}. Если это сделано случайно, ты всегда можешь возобновить подписку.')
 """)
 
 	@dp.callback_query_handler(text='help')
 	async def answer_help(call: types.CallbackQuery):
-		await bot.send_photo(message.from_user.id, HELP_IMG_PATH)
-	pass
+		await bot.send_photo(message.from_user.id, help_img)
 
 
-async def _subscriptions(message):
+async def _subscriptions(message) -> list[str]:
 	# Итерируемся по бд -------------------------------------------------------------------------------------------|||||||||||||||||||||||
 	# Выбираем поле с нужным user_id и хештегом ↓                                                                  |||||||||||||||||||||||
 	#                        ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -105,6 +111,8 @@ async def _subscriptions(message):
 
 
 async def my_subscriptions(message):
+	if set(await _subscriptions(message)) == {0}:
+		await bot.send_message(message.from_user.id, 'Ты ещё не подписан ни на один хештег\U0001f625. Давай это исправим!')
 	await bot.send_message(message.from_user.id, 'Ты подписан на хештеги:')
 	await bot.send_message(message.from_user.id, '\n'.join(compress(HASHTAGS, await _subscriptions(message))))
 

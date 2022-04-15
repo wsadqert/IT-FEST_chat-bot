@@ -1,5 +1,4 @@
 import vk
-from constants import OWNER_IDS
 from tokens import ACCESS_TOKEN
 
 
@@ -9,10 +8,9 @@ def get_posts(owner_id: int, count: int, offset: int) -> dict:
 	return posts
 
 
-def text_from_post(post: dict) -> str:
+def post_text(post: dict) -> str:
 	return post['items'][0]['text']
 
 
 session = vk.Session(ACCESS_TOKEN)
 vk_api = vk.API(session)
-

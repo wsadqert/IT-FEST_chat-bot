@@ -1,12 +1,12 @@
 from aiogram import executor
 from rich.traceback import install
+from constants import GREEN, RED
 
-from constants import *
 import bot
 import database as db
 import vk_parser
 
-install(show_locals=True, width=300)
+install(show_locals=True, width=300)  # для отладки (выводит красивые traceback`и)
 db.init_table()
 
 print(f'{GREEN}[+] bot started!')

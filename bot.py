@@ -1,3 +1,4 @@
+from threading import Thread
 from aiogram import Bot, Dispatcher
 from itertools import compress
 from constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
@@ -6,7 +7,7 @@ import database as db
 
 bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher(bot)
-from bot_additional import create_inline_markup, markup_main, send_help, _subscriptions
+from bot_additional import create_inline_markup, markup_main, send_help, _subscriptions, parser
 
 section: str = 'main'
 
@@ -102,7 +103,8 @@ async def main(message):
 			await bot.send_message(message.from_user.id, CONTACTS_TEXT)
 
 	section = 'main'
-
+	th = Thread(target=parser, daemon=True, args=(message,))
+	th.start()
 	# тут сделать бесконечный цикл, вставить парсер
 	# while True:
 	#   pass

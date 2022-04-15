@@ -1,3 +1,5 @@
+from itertools import compress
+from time import sleep
 from aiogram import types
 from aiogram.types import InputFile
 from bot import dp, bot
@@ -12,7 +14,7 @@ markup_main.add(*buttons1)
 markup_main.add(*buttons2)
 
 markup_help = types.ReplyKeyboardMarkup(resize_keyboard=True)
-markup_help.add(['Помощь'])
+markup_help.add(('Помощь', ))
 
 
 def create_inline_markup(lst: list[str]) -> types.InlineKeyboardMarkup:
@@ -34,3 +36,10 @@ async def _subscriptions(message) -> list[str]:
 	#                        ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	return [cur.execute(f"SELECT {hashtag[1:]} FROM data WHERE user_id = {message.from_user.id}").fetchone()[0] for hashtag in HASHTAGS]
 	# Выбираем 1ую запись (fetchone) и достаём 1ый (и единственный) элемент кортежа -----------------^^^^^^^^^^^^^
+
+
+async def parser(message):
+	hs = compress(HASHTAGS, await _subscriptions(message))
+
+	sleep(2 * 3600)
+	pass

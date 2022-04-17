@@ -10,7 +10,7 @@ CONTACTS_TEXT: Final[str] = """Привет! Если у тебя возникл
 Сайт с мероприятиями https://www.научим.online"""
 SUBSCRIBE_TEXT: Final[str] = "Выбери канал, на который хочешь подписаться:"
 UNSUBSCRIBE_TEXT: Final[str] = "Выбери канал, от которого хочешь отписаться:"
-HELP_IMG_PATH: Final[PATH] = 'hashtags.png'
+HELP_IMG_PATH: Final[PATH] = './src/hashtags.png'
 
 # Database
 DB_PATH: Final[PATH] = './src/data.db'

@@ -18,7 +18,7 @@ DB_PATH: Final[PATH] = './src/data.db'
 # VK
 HASHTAGS: Final[list[str]] = [
 	"#TechnoCom",
-	"#IT_fest_2022",
+	"#ITfest_2022",
 	"#IASF2022",
 	"#ФестивальОКК",
 	"#Нейрофест",

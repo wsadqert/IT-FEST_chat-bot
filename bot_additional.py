@@ -5,7 +5,7 @@ from typing import Literal
 from aiogram import types
 from aiogram.types import InputFile
 from bot import dp, bot
-from constants import HELP_IMG_PATH, HASHTAGS, OWNER_IDS
+from src.constants import HELP_IMG_PATH, HASHTAGS, OWNER_IDS
 from database import cur
 
 # Create main menu markup_main

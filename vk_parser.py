@@ -1,5 +1,5 @@
 import vk
-from tokens import ACCESS_TOKEN
+from src.tokens import ACCESS_TOKEN
 
 
 def get_posts(owner_id: int, count: int, offset: int) -> dict:

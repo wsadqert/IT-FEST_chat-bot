@@ -1,10 +1,9 @@
 from aiogram import executor
 from rich.traceback import install
-from constants import GREEN, RED
+from src.constants import GREEN, RED
 
 import bot
 import database as db
-import vk_parser
 
 install(show_locals=True, width=300)  # для отладки (выводит красивые traceback`и)
 db.init_table()

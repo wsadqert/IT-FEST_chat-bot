@@ -1,8 +1,8 @@
 from threading import Thread
 from aiogram import Bot, Dispatcher
 from itertools import compress
-from constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
-from tokens import TELEGRAM_TOKEN
+from src.constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
+from src.tokens import TELEGRAM_TOKEN
 import database as db
 
 bot = Bot(token=TELEGRAM_TOKEN)

@@ -5,6 +5,7 @@ from src.constants import GREEN, RED
 import bot
 import database as db
 
+
 install(show_locals=True, width=300)  # для отладки (выводит красивые traceback`и)
 db.init_table()
 

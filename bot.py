@@ -1,15 +1,16 @@
 from threading import Thread
 from aiogram import Bot, Dispatcher
 from itertools import compress
-from src.constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT, ABOUT_TEXT
+
+from src.constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT, ABOUT_TEXT, OWNER_IDS
 from src.tokens import TELEGRAM_TOKEN
 import database as db
+from vk_parser import last_post_id
 
 bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher(bot)
-from bot_additional import create_inline_markup, markup_main, send_help, _subscriptions, parser
+from bot_additional import create_inline_markup, markup_main, send_help, _subscriptions, parser  # I can`t move it to top of file because of cyclic import
 
-section: str = 'main'
 flag = False
 
 
@@ -24,8 +25,6 @@ async def start(message):
 
 
 async def subscribe(message):
-	global section
-	section = 'subscribe'
 	hashtags_enabled: list[str] = list(compress(HASHTAGS, _subscriptions(message)))
 	hashtags2subscr: list[str] = list(set(HASHTAGS) - set(hashtags_enabled))
 
@@ -38,9 +37,8 @@ async def subscribe(message):
 @dp.callback_query_handler(text='{hashtag[1:]}' + 's')
 async def answer{hashtags2subscr.index(hashtag)}(call):
 	try:
-		if '{section}' != 'subscribe':
-			raise Exception('unknown section "{section}"')
 		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
+		db.cur.execute(f"UPDATE posts SET {hashtag[1:]} = {last_post_id(OWNER_IDS[HASHTAGS.index(hashtag)])} WHERE user_id = {message.from_user.id}")
 	except Exception as e:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
 		await call.bot.send_message({message.from_user.id}, str(e))
@@ -50,8 +48,6 @@ async def answer{hashtags2subscr.index(hashtag)}(call):
 
 
 async def unsubscribe(message):
-	global section
-	section = 'unsubscribe'
 
 	hashtags_enabled = list(compress(HASHTAGS, _subscriptions(message)))
 	if not hashtags_enabled:
@@ -67,8 +63,6 @@ async def unsubscribe(message):
 @dp.callback_query_handler(text='{hashtag[1:]}' + 'u')
 async def answer{hashtags_enabled.index(hashtag) + 10}(call):
 	try:
-		if '{section}' != 'unsubscribe':
-			raise Exception('unknown section "{section}"')
 		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = false WHERE user_id = {message.from_user.id}")
 	except Exception as e:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
@@ -88,9 +82,7 @@ async def my_subscriptions(message):
 
 @dp.message_handler(content_types=["text"])
 async def main(message):
-	global section, flag
-	if section != 'main':
-		return
+	global flag
 
 	txt = message.text.strip()
 	match txt:
@@ -107,7 +99,6 @@ async def main(message):
 		case "О разработчике":
 			await bot.send_message(message.from_user.id, ABOUT_TEXT)
 
-	section = 'main'
 	if not flag:
 		th = Thread(target=parser, args=(message,))
 		th.start()

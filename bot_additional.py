@@ -46,6 +46,7 @@ def parser(message):
 	hs = compress(HASHTAGS, _subscriptions(message))
 	owners = compress(OWNER_IDS, _subscriptions(message))
 	while True:
-		print('привет)')
+
+		pass
 		sleep(2 * 3600)
 	pass

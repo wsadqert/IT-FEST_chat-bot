@@ -1,11 +1,13 @@
 from threading import Thread
-from aiogram import Bot, Dispatcher
 from itertools import compress
+
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
 
 from src.constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT, ABOUT_TEXT, OWNER_IDS
 from src.tokens import TELEGRAM_TOKEN
 import database as db
-from vk_parser import last_post_id
+from vk_parser import last_post
 
 bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher(bot)
@@ -16,7 +18,7 @@ flag = False
 
 # Start/help
 @dp.message_handler(commands=['start'])
-async def start(message):
+async def start(message: Message):
 	if not db.cur.execute(f"SELECT rowid FROM data WHERE user_id = {message.from_user.id}").fetchall():
 		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Для управления используй кнопки \U0001f447", reply_markup=markup_main)
 		db.init_user(message.from_user.id)
@@ -24,7 +26,7 @@ async def start(message):
 		await bot.send_message(message.from_user.id, "Ошибка: бот уже запущен!", reply_markup=markup_main)
 
 
-async def subscribe(message):
+async def subscribe(message: Message):
 	hashtags_enabled: list[str] = list(compress(HASHTAGS, _subscriptions(message)))
 	hashtags2subscr: list[str] = list(set(HASHTAGS) - set(hashtags_enabled))
 
@@ -38,7 +40,7 @@ async def subscribe(message):
 async def answer{hashtags2subscr.index(hashtag)}(call):
 	try:
 		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
-		db.cur.execute(f"UPDATE posts SET {hashtag[1:]} = {last_post_id(OWNER_IDS[HASHTAGS.index(hashtag)])} WHERE user_id = {message.from_user.id}")
+		# db.cur.execute(f"UPDATE posts SET {hashtag[1:]} = {last_post(OWNER_IDS[HASHTAGS.index(hashtag)])['id']} WHERE user_id = {message.from_user.id}")
 	except Exception as e:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
 		await call.bot.send_message({message.from_user.id}, str(e))
@@ -47,7 +49,7 @@ async def answer{hashtags2subscr.index(hashtag)}(call):
 """)
 
 
-async def unsubscribe(message):
+async def unsubscribe(message: Message):
 
 	hashtags_enabled = list(compress(HASHTAGS, _subscriptions(message)))
 	if not hashtags_enabled:
@@ -72,8 +74,8 @@ async def answer{hashtags_enabled.index(hashtag) + 10}(call):
 """)
 
 
-async def my_subscriptions(message):
-	if set(_subscriptions(message)) == {0}:
+async def my_subscriptions(message: Message):
+	if set(_subscriptions(message)) == {0} or not set(_subscriptions(message)):
 		await bot.send_message(message.from_user.id, 'Ты ещё не подписан ни на один хештег\U0001f625. Давай это исправим!')
 		return
 	await bot.send_message(message.from_user.id, 'Ты подписан на хештеги:')
@@ -81,7 +83,7 @@ async def my_subscriptions(message):
 
 
 @dp.message_handler(content_types=["text"])
-async def main(message):
+async def main(message: Message):
 	global flag
 
 	txt = message.text.strip()
@@ -102,4 +104,5 @@ async def main(message):
 	if not flag:
 		th = Thread(target=parser, args=(message,))
 		th.start()
+	
 	flag = True

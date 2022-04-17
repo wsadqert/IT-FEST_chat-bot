@@ -11,7 +11,7 @@ from database import cur
 # Create main menu markup_main
 markup_main = types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttons1: tuple[str, ...] = ("Подписаться", "Отписаться", "Список подписок")
-buttons2: tuple[str, ...] = ("Помощь", "Контакты для связи")
+buttons2: tuple[str, ...] = ("Помощь", "Контакты для связи", "О разработчике")
 markup_main.add(*buttons1)
 markup_main.add(*buttons2)
 

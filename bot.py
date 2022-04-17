@@ -1,7 +1,7 @@
 from threading import Thread
 from aiogram import Bot, Dispatcher
 from itertools import compress
-from src.constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT
+from src.constants import HASHTAGS, SUBSCRIBE_TEXT, UNSUBSCRIBE_TEXT, GROUP_IDS, CONTACTS_TEXT, ABOUT_TEXT
 from src.tokens import TELEGRAM_TOKEN
 import database as db
 
@@ -19,7 +19,7 @@ async def start(message):
 		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Для управления используй кнопки \U0001f447", reply_markup=markup_main)
 		db.init_user(message.from_user.id)
 	else:
-		await bot.send_message(message.from_user.id, "Ошибка: бот уже запущен!")
+		await bot.send_message(message.from_user.id, "Ошибка: бот уже запущен!", reply_markup=markup_main)
 
 
 async def subscribe(message):
@@ -103,6 +103,8 @@ async def main(message):
 			await send_help(message)
 		case "Контакты для связи":
 			await bot.send_message(message.from_user.id, CONTACTS_TEXT)
+		case "О разработчике":
+			await bot.send_message(message.from_user.id, ABOUT_TEXT)
 
 	section = 'main'
 	th = Thread(target=parser, daemon=True, args=(message,))

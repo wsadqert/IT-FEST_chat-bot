@@ -32,21 +32,20 @@ async def send_help(message):
 	await bot.send_photo(message.from_user.id, InputFile(HELP_IMG_PATH))
 
 
-async def _subscriptions(message) -> list[str]:
-	# Итерируемся по бд -------------------------------------------------------------------------------------------|||||||||||||||||||||||
-	# Выбираем поле с нужным user_id и хештегом ↓                                                                  |||||||||||||||||||||||
-	#                        ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	return [cur.execute(f"SELECT {hashtag[1:]} FROM data WHERE user_id = {message.from_user.id}").fetchone()[0] for hashtag in HASHTAGS]
-	# Выбираем 1ую запись (fetchone) и достаём 1ый (и единственный) элемент кортежа -----------------^^^^^^^^^^^^^
+def _subscriptions(message) -> list[str]:
+	# Итерируемся по бд;
+	# Выбираем поле с нужным user_id и хештегом;
+	# Выбираем 1ую запись (fetchone) и достаём 1ый (и единственный) элемент кортежа;
+	try:
+		return [cur.execute(f"SELECT {hashtag[1:]} FROM data WHERE user_id = {message.from_user.id}").fetchone()[0] for hashtag in HASHTAGS]
+	except TypeError:
+		return []
 
 
-async def parser(message):
-	hs = compress(HASHTAGS, await _subscriptions(message))
-	print('qwertyuiop', hs)
-	owners = compress(OWNER_IDS, await _subscriptions(message))
+def parser(message):
+	hs = compress(HASHTAGS, _subscriptions(message))
+	owners = compress(OWNER_IDS, _subscriptions(message))
 	while True:
-
-		pass
+		print('привет)')
 		sleep(2 * 3600)
-		pass
 	pass

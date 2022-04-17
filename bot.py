@@ -10,6 +10,7 @@ dp = Dispatcher(bot)
 from bot_additional import create_inline_markup, markup_main, send_help, _subscriptions, parser
 
 section: str = 'main'
+flag = False
 
 
 # Start/help
@@ -25,7 +26,7 @@ async def start(message):
 async def subscribe(message):
 	global section
 	section = 'subscribe'
-	hashtags_enabled: list[str] = list(compress(HASHTAGS, await _subscriptions(message)))
+	hashtags_enabled: list[str] = list(compress(HASHTAGS, _subscriptions(message)))
 	hashtags2subscr: list[str] = list(set(HASHTAGS) - set(hashtags_enabled))
 
 	# Создание markup`а и отправка сообщения
@@ -52,7 +53,7 @@ async def unsubscribe(message):
 	global section
 	section = 'unsubscribe'
 
-	hashtags_enabled = list(compress(HASHTAGS, await _subscriptions(message)))
+	hashtags_enabled = list(compress(HASHTAGS, _subscriptions(message)))
 	if not hashtags_enabled:
 		await my_subscriptions(message)
 		return
@@ -78,16 +79,16 @@ async def answer{hashtags_enabled.index(hashtag) + 10}(call):
 
 
 async def my_subscriptions(message):
-	if set(await _subscriptions(message)) == {0}:
+	if set(_subscriptions(message)) == {0}:
 		await bot.send_message(message.from_user.id, 'Ты ещё не подписан ни на один хештег\U0001f625. Давай это исправим!')
 		return
 	await bot.send_message(message.from_user.id, 'Ты подписан на хештеги:')
-	await bot.send_message(message.from_user.id, '\n'.join(compress(HASHTAGS, await _subscriptions(message))))
+	await bot.send_message(message.from_user.id, '\n'.join(compress(HASHTAGS, _subscriptions(message))))
 
 
 @dp.message_handler(content_types=["text"])
 async def main(message):
-	global section
+	global section, flag
 	if section != 'main':
 		return
 
@@ -107,9 +108,7 @@ async def main(message):
 			await bot.send_message(message.from_user.id, ABOUT_TEXT)
 
 	section = 'main'
-	th = Thread(target=parser, daemon=True, args=(message,))
-	th.start()
-	# тут сделать бесконечный цикл, вставить парсер
-	# while True:
-	#   pass
-	# pass
+	if not flag:
+		th = Thread(target=parser, args=(message,))
+		th.start()
+	flag = True

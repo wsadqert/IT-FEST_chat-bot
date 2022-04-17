@@ -40,7 +40,7 @@ async def subscribe(message: Message):
 async def answer{hashtags2subscr.index(hashtag)}(call):
 	try:
 		db.cur.execute(f"UPDATE data SET {hashtag[1:]} = true WHERE user_id = {message.from_user.id}")
-		# db.cur.execute(f"UPDATE posts SET {hashtag[1:]} = {last_post(OWNER_IDS[HASHTAGS.index(hashtag)])['id']} WHERE user_id = {message.from_user.id}")
+		db.cur.execute(f"UPDATE posts SET {hashtag[1:]} = {last_post(OWNER_IDS[HASHTAGS.index(hashtag)])['id']} WHERE user_id = {message.from_user.id}")
 	except Exception as e:
 		await call.bot.send_message({message.from_user.id}, f'Произошла неизвестная ошибка!\u274c\U0001f937')
 		await call.bot.send_message({message.from_user.id}, str(e))

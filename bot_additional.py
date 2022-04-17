@@ -1,9 +1,11 @@
 from itertools import compress
 from time import sleep
+from typing import Literal
+
 from aiogram import types
 from aiogram.types import InputFile
 from bot import dp, bot
-from constants import HELP_IMG_PATH, HASHTAGS
+from constants import HELP_IMG_PATH, HASHTAGS, OWNER_IDS
 from database import cur
 
 # Create main menu markup_main
@@ -17,10 +19,10 @@ markup_help = types.ReplyKeyboardMarkup(resize_keyboard=True)
 markup_help.add(('Помощь', ))
 
 
-def create_inline_markup(lst: list[str]) -> types.InlineKeyboardMarkup:
+def create_inline_markup(lst: list[str], suffix: str = Literal['s', 'u']) -> types.InlineKeyboardMarkup:
 	markup = types.InlineKeyboardMarkup()
 	for hashtag in lst:
-		markup.add(types.InlineKeyboardButton(text=hashtag, callback_data=hashtag[1:]))
+		markup.add(types.InlineKeyboardButton(text=hashtag, callback_data=hashtag[1:] + suffix))
 	markup.add(types.InlineKeyboardButton(text='Помощь', callback_data='help'))
 	return markup
 
@@ -40,6 +42,11 @@ async def _subscriptions(message) -> list[str]:
 
 async def parser(message):
 	hs = compress(HASHTAGS, await _subscriptions(message))
+	print('qwertyuiop', hs)
+	owners = compress(OWNER_IDS, await _subscriptions(message))
+	while True:
 
-	sleep(2 * 3600)
+		pass
+		sleep(2 * 3600)
+		pass
 	pass

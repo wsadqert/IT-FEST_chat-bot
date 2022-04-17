@@ -25,15 +25,17 @@ async def start(message):
 async def subscribe(message):
 	global section
 	section = 'subscribe'
+	hashtags_enabled: list[str] = list(compress(HASHTAGS, await _subscriptions(message)))
+	hashtags2subscr: list[str] = list(set(HASHTAGS) - set(hashtags_enabled))
 
 	# Создание markup`а и отправка сообщения
-	await bot.send_message(message.from_user.id, SUBSCRIBE_TEXT, reply_markup=create_inline_markup(HASHTAGS))
+	await bot.send_message(message.from_user.id, SUBSCRIBE_TEXT, reply_markup=create_inline_markup(hashtags2subscr, 's'))
 
 	# создание и привязка функций к кнопкам
-	for hashtag in HASHTAGS:
+	for hashtag in hashtags2subscr:
 		exec(f"""
-@dp.callback_query_handler(text=hashtag[1:])
-async def answer{HASHTAGS.index(hashtag)}(call):
+@dp.callback_query_handler(text='{hashtag[1:]}' + 's')
+async def answer{hashtags2subscr.index(hashtag)}(call):
 	try:
 		if '{section}' != 'subscribe':
 			raise Exception('unknown section "{section}"')
@@ -56,12 +58,12 @@ async def unsubscribe(message):
 		return
 
 	# Создание markup`а и отправка сообщения
-	await bot.send_message(message.from_user.id, UNSUBSCRIBE_TEXT, reply_markup=create_inline_markup(hashtags_enabled))
+	await bot.send_message(message.from_user.id, UNSUBSCRIBE_TEXT, reply_markup=create_inline_markup(hashtags_enabled, 'u'))
 
 	# создание и привязка функций к кнопкам
 	for hashtag in hashtags_enabled:
 		exec(f"""
-@dp.callback_query_handler(text=hashtag[1:])
+@dp.callback_query_handler(text='{hashtag[1:]}' + 'u')
 async def answer{hashtags_enabled.index(hashtag) + 10}(call):
 	try:
 		if '{section}' != 'unsubscribe':

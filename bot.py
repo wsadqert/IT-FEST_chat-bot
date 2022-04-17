@@ -15,7 +15,7 @@ section: str = 'main'
 # Start/help
 @dp.message_handler(commands=['start'])
 async def start(message):
-	if section == 'main':
+	if not db.cur.execute(f"SELECT rowid FROM data WHERE user_id = {message.from_user.id}").fetchall():
 		await bot.send_message(message.from_user.id, f"Привет, {message.from_user.first_name}! Для управления используй кнопки \U0001f447", reply_markup=markup_main)
 		db.init_user(message.from_user.id)
 	else:

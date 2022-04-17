@@ -13,7 +13,7 @@ UNSUBSCRIBE_TEXT: Final[str] = "Выбери канал, от которого �
 HELP_IMG_PATH: Final[PATH] = 'hashtags.png'
 
 # Database
-DB_PATH: Final[PATH] = 'data.db'
+DB_PATH: Final[PATH] = './src/data.db'
 
 # VK
 HASHTAGS: Final[list[str]] = [

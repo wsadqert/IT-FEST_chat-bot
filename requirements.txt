@@ -1,6 +1,5 @@
 colorama~=0.4.4
 vk~=2.0.2
 rich~=12.2.0
-python_version~3.10
 typing~=3.7.4.3
 aiogram~=2.19
